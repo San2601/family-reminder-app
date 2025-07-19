@@ -1,0 +1,20 @@
+{
+  "name": "family-reminder-app-serverless",
+  "version": "1.0.0",
+  "description": "A reminder application for family birthdays and events - Serverless version",
+  "main": "api/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "cd client && npm run build",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.2.2",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3"
+  },
+  "keywords": ["reminder", "birthday", "events", "family", "serverless"],
+  "author": "",
+  "license": "MIT"
+}
