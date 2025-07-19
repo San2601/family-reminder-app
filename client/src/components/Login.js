@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { LogIn, UserPlus, Mail, Lock, User, Calendar, Eye, EyeOff } from 'lucide-react';
 
@@ -12,6 +12,17 @@ function Login({ onLogin }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+
+  // Load saved credentials on component mount
+  useEffect(() => {
+    const savedCredentials = localStorage.getItem('savedCredentials');
+    if (savedCredentials) {
+      const { email, password, remember } = JSON.parse(savedCredentials);
+      setFormData(prev => ({ ...prev, email, password }));
+      setRememberMe(remember);
+    }
+  }, []);
 
   const handleChange = (e) => {
     setFormData({
@@ -32,6 +43,19 @@ function Login({ onLogin }) {
         : { username: formData.username, email: formData.email, password: formData.password };
 
       const response = await axios.post(endpoint, data);
+      
+      // Save credentials if Remember Me is checked and login is successful
+      if (isLogin && rememberMe) {
+        localStorage.setItem('savedCredentials', JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          remember: true
+        }));
+      } else if (isLogin && !rememberMe) {
+        // Remove saved credentials if Remember Me is unchecked
+        localStorage.removeItem('savedCredentials');
+      }
+      
       onLogin(response.data.user, response.data.token);
     } catch (err) {
       setError(err.response?.data?.error || 'An error occurred');
@@ -138,6 +162,20 @@ function Login({ onLogin }) {
             </button>
           </div>
         </div>
+        
+        {isLogin && (
+          <div className="form-group">
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                style={{ width: 'auto', margin: '0 8px 0 0' }}
+              />
+              Remember my login credentials
+            </label>
+          </div>
+        )}
         
         <button type="submit" className="btn btn-primary" disabled={loading}>
           {isLogin ? <LogIn size={16} /> : <UserPlus size={16} />}
