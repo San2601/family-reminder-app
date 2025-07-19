@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Plus, Calendar, Users, Bell, Loader2 } from 'lucide-react';
 import EventForm from './EventForm';
 import EventCard from './EventCard';
 
@@ -18,7 +19,7 @@ function Dashboard({ user, onLogout }) {
 
   const fetchEvents = async () => {
     try {
-      const response = await axios.get('/events');
+      const response = await axios.get('/api/events');
       setEvents(response.data);
     } catch (err) {
       setError('Failed to fetch events');
@@ -29,7 +30,7 @@ function Dashboard({ user, onLogout }) {
 
   const fetchUpcomingEvents = async () => {
     try {
-      const response = await axios.get('/upcoming-events');
+      const response = await axios.get('/api/upcoming-events');
       setUpcomingEvents(response.data);
     } catch (err) {
       console.error('Failed to fetch upcoming events');
@@ -52,7 +53,7 @@ function Dashboard({ user, onLogout }) {
 
   const handleEventDeleted = async (eventId) => {
     try {
-      await axios.delete(`/events/${eventId}`);
+      await axios.delete(`/api/events/${eventId}`);
       setEvents(events.filter(event => event.id !== eventId));
       fetchUpcomingEvents();
     } catch (err) {
@@ -83,9 +84,10 @@ function Dashboard({ user, onLogout }) {
 
   if (loading) {
     return (
-      <div className="container">
-        <div className="auth-form">
-          <h2>Loading...</h2>
+      <div className="loading-container">
+        <div className="loading-content">
+          <Loader2 className="loading-icon" size={40} />
+          <h2>Loading your events...</h2>
         </div>
       </div>
     );
@@ -94,83 +96,102 @@ function Dashboard({ user, onLogout }) {
   return (
     <div className="container">
       <header className="header">
-        <h1>Welcome, {user.username}!</h1>
-        <div>
-          <button
-            className="btn btn-small"
-            onClick={() => setShowEventForm(true)}
-            style={{ marginRight: '10px' }}
-          >
-            Add Event
-          </button>
-          <button className="logout-btn" onClick={onLogout}>
-            Logout
-          </button>
+        <div className="header-content">
+          <div className="header-info">
+            <h1>
+              <Calendar className="header-icon" size={32} />
+              Welcome, {user.username}!
+            </h1>
+            <p className="header-subtitle">Manage your family's important events and reminders</p>
+          </div>
+          <div className="header-actions">
+            <button
+              className="action-button"
+              onClick={() => setShowEventForm(true)}
+            >
+              <Plus size={20} />
+              Add Event
+            </button>
+            <button className="logout-btn" onClick={onLogout}>
+              Logout
+            </button>
+          </div>
         </div>
       </header>
 
       {error && <div className="error-message">{error}</div>}
 
-      {upcomingEvents.length > 0 && (
-        <div className="upcoming-events">
-          <h2>🎉 Upcoming Events (Next 7 Days)</h2>
-          <div className="events-grid">
-            {upcomingEvents.map(event => (
-              <div key={event.id} className="event-card" style={{ border: '2px solid #ffc107' }}>
-                <h3>{event.title}</h3>
-                <div className="event-date">{formatDate(event.event_date)}</div>
-                <div className="event-type">{event.event_type}</div>
-                <div style={{ color: '#ffc107', fontWeight: 'bold' }}>
-                  {getDaysUntil(event.event_date)}
-                </div>
-                <div style={{ 
-                  marginTop: '10px', 
-                  fontSize: '13px', 
-                  color: '#667eea',
-                  fontWeight: '600',
-                  background: 'rgba(102, 126, 234, 0.1)',
-                  padding: '4px 8px',
-                  borderRadius: '6px',
-                  display: 'inline-block'
-                }}>
-                  👤 Created by {event.creator_name}
-                </div>
-                {event.description && (
-                  <p style={{ marginTop: '10px', color: '#666' }}>{event.description}</p>
-                )}
+      <div className={`dashboard-main ${upcomingEvents.length === 0 ? 'no-sidebar' : ''}`}>
+        {upcomingEvents.length > 0 && (
+          <div className="dashboard-sidebar">
+            <div className="upcoming-events">
+              <h2>
+                <Bell className="section-icon" size={24} />
+                Upcoming Events
+              </h2>
+              <div className="events-grid">
+                {upcomingEvents.map(event => (
+                  <div key={event.id} className="event-card" style={{ borderTop: '4px solid #FF6B9D' }}>
+                    <div className="event-card-header">
+                      <h3>{event.title}</h3>
+                    </div>
+                    <div className="event-card-body">
+                      <div className="event-date">
+                        <Calendar size={16} />
+                        {formatDate(event.event_date)}
+                      </div>
+                      <div className="event-countdown" style={{ color: '#FF6B9D', fontWeight: 'bold' }}>
+                        <Clock size={16} />
+                        {getDaysUntil(event.event_date)}
+                      </div>
+                      <div className="event-creator">
+                        <Users size={14} />
+                        {event.creator_name}
+                      </div>
+                      {event.description && (
+                        <p className="event-description">{event.description}</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '30px 0 20px 0' }}>
-        <h2 style={{ color: 'white' }}>Family Events ({events.length})</h2>
-        <p style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '14px' }}>
-          All family members can see these events
-        </p>
+        <div className="dashboard-content">
+          <div className="section-header">
+            <h2>
+              <Users className="section-icon" size={24} />
+              Family Events ({events.length})
+            </h2>
+            <p className="section-subtitle">
+              All family members can see these events
+            </p>
+          </div>
+
+          {events.length === 0 ? (
+            <div className="no-events">
+              <h3>No family events yet!</h3>
+              <p>Click "Add Event" to create the first shared family reminder.</p>
+            </div>
+          ) : (
+            <div className="events-grid">
+              {events.map(event => (
+                <EventCard
+                  key={event.id}
+                  event={event}
+                  currentUser={user}
+                  onEdit={setEditingEvent}
+                  onDelete={handleEventDeleted}
+                  formatDate={formatDate}
+                  getDaysUntil={getDaysUntil}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-
-      {events.length === 0 ? (
-        <div className="no-events">
-          <h3>No family events yet!</h3>
-          <p>Click "Add Event" to create the first shared family reminder.</p>
-        </div>
-      ) : (
-        <div className="events-grid">
-          {events.map(event => (
-            <EventCard
-              key={event.id}
-              event={event}
-              currentUser={user}
-              onEdit={setEditingEvent}
-              onDelete={handleEventDeleted}
-              formatDate={formatDate}
-              getDaysUntil={getDaysUntil}
-            />
-          ))}
-        </div>
-      )}
 
       {(showEventForm || editingEvent) && (
         <EventForm

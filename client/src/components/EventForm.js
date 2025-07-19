@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Save, X, Calendar, Clock, Type, AlignLeft, Repeat } from 'lucide-react';
 
 function EventForm({ event, onSave, onCancel }) {
   const [formData, setFormData] = useState({
@@ -42,10 +43,10 @@ function EventForm({ event, onSave, onCancel }) {
     try {
       let response;
       if (event) {
-        response = await axios.put(`/events/${event.id}`, formData);
+        response = await axios.put(`/api/events/${event.id}`, formData);
         onSave({ ...event, ...formData });
       } else {
-        response = await axios.post('/events', formData);
+        response = await axios.post('/api/events', formData);
         onSave(response.data);
       }
     } catch (err) {
@@ -58,13 +59,24 @@ function EventForm({ event, onSave, onCancel }) {
   return (
     <div className="modal-overlay">
       <div className="modal">
-        <h2>{event ? 'Edit Event' : 'Add New Event'}</h2>
+        <div className="modal-header">
+          <h2>
+            <Calendar size={24} />
+            {event ? 'Edit Event' : 'Add New Event'}
+          </h2>
+          <button className="modal-close" onClick={onCancel}>
+            <X size={20} />
+          </button>
+        </div>
         
         {error && <div className="error-message">{error}</div>}
         
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="enhanced-form">
           <div className="form-group">
-            <label htmlFor="title">Event Title *</label>
+            <label htmlFor="title">
+              <Type size={16} />
+              Event Title *
+            </label>
             <input
               type="text"
               id="title"
@@ -76,37 +88,48 @@ function EventForm({ event, onSave, onCancel }) {
             />
           </div>
           
-          <div className="form-group">
-            <label htmlFor="event_date">Date *</label>
-            <input
-              type="date"
-              id="event_date"
-              name="event_date"
-              value={formData.event_date}
-              onChange={handleChange}
-              required
-            />
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="event_date">
+                <Calendar size={16} />
+                Date *
+              </label>
+              <input
+                type="date"
+                id="event_date"
+                name="event_date"
+                value={formData.event_date}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="event_type">
+                <Type size={16} />
+                Type
+              </label>
+              <select
+                id="event_type"
+                name="event_type"
+                value={formData.event_type}
+                onChange={handleChange}
+              >
+                <option value="birthday">🎂 Birthday</option>
+                <option value="anniversary">💖 Anniversary</option>
+                <option value="holiday">🎄 Holiday</option>
+                <option value="appointment">💼 Appointment</option>
+                <option value="meeting">☕ Meeting</option>
+                <option value="general">📅 General Event</option>
+              </select>
+            </div>
           </div>
           
           <div className="form-group">
-            <label htmlFor="event_type">Type</label>
-            <select
-              id="event_type"
-              name="event_type"
-              value={formData.event_type}
-              onChange={handleChange}
-            >
-              <option value="birthday">Birthday</option>
-              <option value="anniversary">Anniversary</option>
-              <option value="holiday">Holiday</option>
-              <option value="appointment">Appointment</option>
-              <option value="meeting">Meeting</option>
-              <option value="general">General Event</option>
-            </select>
-          </div>
-          
-          <div className="form-group">
-            <label htmlFor="reminder_days">Remind me (days before)</label>
+            <label htmlFor="reminder_days">
+              <Clock size={16} />
+              Remind me (days before)
+            </label>
             <select
               id="reminder_days"
               name="reminder_days"
@@ -122,7 +145,10 @@ function EventForm({ event, onSave, onCancel }) {
           </div>
           
           <div className="form-group">
-            <label htmlFor="description">Description (optional)</label>
+            <label htmlFor="description">
+              <AlignLeft size={16} />
+              Description (optional)
+            </label>
             <textarea
               id="description"
               name="description"
@@ -130,31 +156,27 @@ function EventForm({ event, onSave, onCancel }) {
               onChange={handleChange}
               placeholder="Additional details about the event"
               rows={3}
-              style={{
-                width: '100%',
-                padding: '12px',
-                border: '2px solid #ddd',
-                borderRadius: '5px',
-                fontSize: '16px',
-                resize: 'vertical'
-              }}
             />
           </div>
           
-          <div className="form-group">
-            <label style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div className="form-group checkbox-group">
+            <label className="checkbox-label">
               <input
                 type="checkbox"
                 name="is_recurring"
                 checked={formData.is_recurring}
                 onChange={handleChange}
               />
+              <span className="checkmark">
+                <Repeat size={16} />
+              </span>
               Recurring annually (for birthdays, anniversaries)
             </label>
           </div>
           
-          <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
-            <button type="submit" className="btn" disabled={loading}>
+          <div className="form-actions">
+            <button type="submit" className="btn btn-primary" disabled={loading}>
+              <Save size={16} />
               {loading ? 'Saving...' : (event ? 'Update Event' : 'Create Event')}
             </button>
             <button
@@ -163,6 +185,7 @@ function EventForm({ event, onSave, onCancel }) {
               onClick={onCancel}
               disabled={loading}
             >
+              <X size={16} />
               Cancel
             </button>
           </div>

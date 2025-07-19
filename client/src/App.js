@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Loader2 } from 'lucide-react';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+// Use proxy in development, explicit URL in production
+const API_URL = process.env.REACT_APP_API_URL || '';
 
-axios.defaults.baseURL = API_URL;
+if (API_URL) {
+  axios.defaults.baseURL = API_URL;
+}
 
 function App() {
   const [user, setUser] = useState(null);
@@ -39,16 +43,18 @@ function App() {
 
   if (loading) {
     return (
-      <div className="auth-container">
-        <div className="auth-form">
-          <h2>Loading...</h2>
+      <div className="loading-container">
+        <div className="loading-content">
+          <Loader2 className="loading-icon" size={40} />
+          <h2>Loading Family Reminders...</h2>
+          <p>Getting everything ready for you</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="App">
+    <div className="app-container">
       {user ? (
         <Dashboard user={user} onLogout={handleLogout} />
       ) : (
