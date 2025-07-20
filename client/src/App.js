@@ -2,7 +2,6 @@ import React, { useState, useEffect, Suspense, lazy } from 'react';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
 import ErrorBoundary from './components/ErrorBoundary';
-import logger from './utils/logger';
 
 // Lazy load components for better performance
 const Login = lazy(() => import('./components/Login'));
