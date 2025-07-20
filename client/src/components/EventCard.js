@@ -3,6 +3,27 @@ import { Edit3, Trash2, User, Calendar, Clock, Repeat, Gift, Heart, TreePine, Br
 import axios from 'axios';
 
 function EventCard({ event, onEdit, onDelete, formatDate, getDaysUntil, currentUser, onAdminDelete }) {
+  // Safe date formatting
+  const safeFormatDate = (dateString) => {
+    if (!dateString) return 'Invalid Date';
+    try {
+      return formatDate(dateString);
+    } catch (error) {
+      console.error('Date formatting error:', error, dateString);
+      return 'Invalid Date';
+    }
+  };
+
+  // Safe days until calculation
+  const safeGetDaysUntil = (dateString) => {
+    if (!dateString) return 'Invalid Date';
+    try {
+      return getDaysUntil(dateString);
+    } catch (error) {
+      console.error('Days until error:', error, dateString);
+      return 'Invalid Date';
+    }
+  };
   const getEventTypeColor = (type) => {
     const colors = {
       birthday: '#ff6b6b',
@@ -67,21 +88,21 @@ function EventCard({ event, onEdit, onDelete, formatDate, getDaysUntil, currentU
       <div className="event-card-body">
         <div className="event-date">
           <Calendar size={16} />
-          {formatDate(event.event_date)}
+          {safeFormatDate(event.event_date)}
         </div>
         
         <div className="event-countdown">
           <Clock size={16} />
           <span style={{ 
-            color: getDaysUntil(event.event_date).includes('ago') ? '#dc3545' : '#28a745'
+            color: safeGetDaysUntil(event.event_date).includes('ago') ? '#dc3545' : '#28a745'
           }}>
-            {getDaysUntil(event.event_date)}
+            {safeGetDaysUntil(event.event_date)}
           </span>
         </div>
         
         <div className="event-creator">
           <User size={14} />
-          Created by {event.creator_name}
+          Created by {event.creator_name || 'Unknown'}
         </div>
         
         {event.description && (
@@ -91,7 +112,7 @@ function EventCard({ event, onEdit, onDelete, formatDate, getDaysUntil, currentU
         <div className="event-meta">
           <span className="reminder-info">
             <Clock size={12} />
-            Reminder: {event.reminder_days} days before
+            Reminder: {event.reminder_days || 1} days before
           </span>
           {event.is_recurring && (
             <span className="recurring-info">

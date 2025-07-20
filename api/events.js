@@ -81,15 +81,15 @@ module.exports = async (req, res) => {
         
         const events = await new Promise((resolve, reject) => {
           db.all(
-            `SELECT e.*, u.username as creator_name 
+            `SELECT e.*, COALESCE(u.username, 'Unknown User') as creator_name 
              FROM events e 
-             JOIN users u ON e.creator_id = u.id 
+             LEFT JOIN users u ON e.creator_id = u.id 
              WHERE e.event_date BETWEEN ? AND ? 
              ORDER BY e.event_date ASC`,
             [today, nextWeek],
             (err, rows) => {
               if (err) reject(err);
-              else resolve(rows);
+              else resolve(rows || []);
             }
           );
         });
@@ -97,12 +97,12 @@ module.exports = async (req, res) => {
         db.close();
         res.json(events);
       } else {
-        // Get all events
+        // Get all events with LEFT JOIN to handle missing users
         const events = await new Promise((resolve, reject) => {
           db.all(
-            `SELECT e.*, u.username as creator_name 
+            `SELECT e.*, COALESCE(u.username, 'Unknown User') as creator_name 
              FROM events e 
-             JOIN users u ON e.creator_id = u.id 
+             LEFT JOIN users u ON e.creator_id = u.id 
              ORDER BY e.event_date ASC`,
             (err, rows) => {
               if (err) reject(err);
