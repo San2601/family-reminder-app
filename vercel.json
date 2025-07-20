@@ -17,5 +17,6 @@
     }
   ],
   "buildCommand": "npm run install-deps && cd client && npm run build",
-  "outputDirectory": "client/build"
+  "outputDirectory": "client/build",
+  "framework": null
 }
