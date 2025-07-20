@@ -1,14 +1,11 @@
 {
   "version": 2,
-  "buildCommand": "npm run install-deps && cd client && npm run build",
-  "devCommand": "npm run dev",
-  "installCommand": "npm install",
-  "outputDirectory": "client/build",
-  "functions": {
-    "server/index.js": {
-      "runtime": "nodejs18.x"
+  "builds": [
+    {
+      "src": "server/index.js",
+      "use": "@vercel/node"
     }
-  },
+  ],
   "routes": [
     {
       "src": "/api/(.*)",
@@ -18,5 +15,7 @@
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ]
+  ],
+  "buildCommand": "npm run install-deps && cd client && npm run build",
+  "outputDirectory": "client/build"
 }
