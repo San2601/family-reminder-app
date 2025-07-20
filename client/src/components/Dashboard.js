@@ -69,16 +69,6 @@ function Dashboard({ user, onLogout }) {
     fetchUpcomingEvents();
   };
 
-  const triggerReminders = async () => {
-    try {
-      const response = await axios.post('/api/trigger-reminders');
-      logger.log('Reminders triggered:', response.data);
-      alert(`Reminders processed: ${response.data.eventsProcessed || 0} events`);
-    } catch (err) {
-      logger.error('Failed to trigger reminders:', err);
-      alert('Failed to trigger reminders');
-    }
-  };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -140,16 +130,6 @@ function Dashboard({ user, onLogout }) {
               <Plus size={20} />
               Add Event
             </button>
-            {user.is_admin && (
-              <button
-                className="action-button"
-                onClick={triggerReminders}
-                style={{ background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)' }}
-              >
-                <Bell size={20} />
-                Test Reminders
-              </button>
-            )}
             <button className="logout-btn" onClick={onLogout}>
               Logout
             </button>

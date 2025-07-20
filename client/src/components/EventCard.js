@@ -69,8 +69,9 @@ function EventCard({ event, onEdit, onDelete, formatDate, getDaysUntil, currentU
     }
   };
 
-  const isCreator = currentUser && event.creator_id === currentUser.id;
-  const isAdmin = currentUser && currentUser.is_admin;
+  // In a family app, everyone can edit/delete any event
+  const canEdit = currentUser && true; // All logged-in users can edit
+  const canDelete = currentUser && true; // All logged-in users can delete
 
   return (
     <div className="event-card">
@@ -123,41 +124,31 @@ function EventCard({ event, onEdit, onDelete, formatDate, getDaysUntil, currentU
         </div>
       </div>
       
-      {(isCreator || isAdmin) && (
+      {(canEdit || canDelete) && (
         <div className="event-actions">
-          {isCreator && (
-            <>
-              <button
-                className="btn btn-small btn-warning"
-                onClick={() => onEdit(event)}
-              >
-                <Edit3 size={14} />
-                Edit
-              </button>
-              <button
-                className="btn btn-small btn-danger"
-                onClick={handleDelete}
-              >
-                <Trash2 size={14} />
-                Delete
-              </button>
-            </>
-          )}
-          {isAdmin && !isCreator && (
+          {canEdit && (
             <button
-              className="btn btn-small btn-admin"
-              onClick={handleAdminDelete}
-              title="Admin delete - can delete any event"
+              className="btn btn-small btn-warning"
+              onClick={() => onEdit(event)}
             >
-              <Shield size={14} />
-              Admin Delete
+              <Edit3 size={14} />
+              Edit
+            </button>
+          )}
+          {canDelete && (
+            <button
+              className="btn btn-small btn-danger"
+              onClick={handleDelete}
+            >
+              <Trash2 size={14} />
+              Delete
             </button>
           )}
         </div>
       )}
-      {!isCreator && !isAdmin && (
+      {!canEdit && !canDelete && (
         <div className="event-permissions-notice">
-          Only the creator can edit this event
+          Please log in to edit events
         </div>
       )}
     </div>
