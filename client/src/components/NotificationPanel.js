@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { X, Check, CheckCheck, Calendar, User, Bell } from 'lucide-react';
+import { X, CheckCheck, Bell } from 'lucide-react';
+import { useSwipeable } from 'react-swipeable';
+import NotificationItem from './NotificationItem';
+import logger from '../utils/logger';
 
 function NotificationPanel({ onClose, onNotificationRead }) {
   const [notifications, setNotifications] = useState([]);
@@ -11,7 +14,7 @@ function NotificationPanel({ onClose, onNotificationRead }) {
       const response = await axios.get('/api/notifications');
       setNotifications(response.data);
     } catch (error) {
-      console.error('Error fetching notifications:', error);
+      logger.error('Error fetching notifications:', error);
     } finally {
       setLoading(false);
     }
@@ -31,7 +34,7 @@ function NotificationPanel({ onClose, onNotificationRead }) {
       );
       onNotificationRead();
     } catch (error) {
-      console.error('Error marking notification as read:', error);
+      logger.error('Error marking notification as read:', error);
     }
   };
 
@@ -43,7 +46,7 @@ function NotificationPanel({ onClose, onNotificationRead }) {
       );
       onNotificationRead();
     } catch (error) {
-      console.error('Error marking all notifications as read:', error);
+      logger.error('Error marking all notifications as read:', error);
     }
   };
 
@@ -66,9 +69,22 @@ function NotificationPanel({ onClose, onNotificationRead }) {
 
   const unreadNotifications = notifications.filter(n => !n.is_read);
 
+  // Swipe handlers for mobile
+  const swipeHandlers = useSwipeable({
+    onSwipedRight: onClose,
+    onSwipedDown: onClose,
+    preventDefaultTouchmoveEvent: true,
+    trackTouch: true,
+    trackMouse: false
+  });
+
   return (
     <div className="notification-panel-overlay" onClick={onClose}>
-      <div className="notification-panel" onClick={(e) => e.stopPropagation()}>
+      <div 
+        className="notification-panel" 
+        onClick={(e) => e.stopPropagation()}
+        {...swipeHandlers}
+      >
         <div className="notification-header">
           <h3>Notifications</h3>
           <div className="notification-header-actions">
@@ -102,36 +118,12 @@ function NotificationPanel({ onClose, onNotificationRead }) {
           ) : (
             <div className="notification-list">
               {notifications.map((notification) => (
-                <div 
-                  key={notification.id} 
-                  className={`notification-item ${!notification.is_read ? 'unread' : ''}`}
-                >
-                  <div className="notification-icon">
-                    <Calendar size={20} />
-                  </div>
-                  <div className="notification-body">
-                    <h4>{notification.title}</h4>
-                    <p>{notification.message}</p>
-                    <div className="notification-meta">
-                      <span className="notification-time">
-                        {formatTimeAgo(notification.created_at)}
-                      </span>
-                      <span className="notification-creator">
-                        <User size={12} />
-                        {notification.creator_name}
-                      </span>
-                    </div>
-                  </div>
-                  {!notification.is_read && (
-                    <button 
-                      className="mark-read-btn"
-                      onClick={() => markAsRead(notification.id)}
-                      title="Mark as read"
-                    >
-                      <Check size={14} />
-                    </button>
-                  )}
-                </div>
+                <NotificationItem
+                  key={notification.id}
+                  notification={notification}
+                  onMarkAsRead={markAsRead}
+                  formatTimeAgo={formatTimeAgo}
+                />
               ))}
             </div>
           )}

@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
-import Login from './components/Login';
-import Dashboard from './components/Dashboard';
+import ErrorBoundary from './components/ErrorBoundary';
+import logger from './utils/logger';
+
+// Lazy load components for better performance
+const Login = lazy(() => import('./components/Login'));
+const Dashboard = lazy(() => import('./components/Dashboard'));
 
 // Use proxy in development, explicit URL in production
 const API_URL = process.env.REACT_APP_API_URL || '';
@@ -54,13 +58,24 @@ function App() {
   }
 
   return (
-    <div className="app-container">
-      {user ? (
-        <Dashboard user={user} onLogout={handleLogout} />
-      ) : (
-        <Login onLogin={handleLogin} />
-      )}
-    </div>
+    <ErrorBoundary>
+      <div className="app-container">
+        <Suspense fallback={
+          <div className="loading-container">
+            <div className="loading-content">
+              <Loader2 className="loading-icon" size={40} />
+              <h2>Loading...</h2>
+            </div>
+          </div>
+        }>
+          {user ? (
+            <Dashboard user={user} onLogout={handleLogout} />
+          ) : (
+            <Login onLogin={handleLogin} />
+          )}
+        </Suspense>
+      </div>
+    </ErrorBoundary>
   );
 }
 

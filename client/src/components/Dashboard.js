@@ -5,6 +5,7 @@ import EventForm from './EventForm';
 import EventCard from './EventCard';
 import NotificationBell from './NotificationBell';
 import ErrorBoundary from './ErrorBoundary';
+import logger from '../utils/logger';
 
 function Dashboard({ user, onLogout }) {
   const [events, setEvents] = useState([]);
@@ -35,7 +36,7 @@ function Dashboard({ user, onLogout }) {
       const response = await axios.get('/api/upcoming-events');
       setUpcomingEvents(response.data);
     } catch (err) {
-      console.error('Failed to fetch upcoming events');
+      logger.error('Failed to fetch upcoming events');
     }
   };
 
@@ -71,10 +72,10 @@ function Dashboard({ user, onLogout }) {
   const triggerReminders = async () => {
     try {
       const response = await axios.post('/api/trigger-reminders');
-      console.log('Reminders triggered:', response.data);
+      logger.log('Reminders triggered:', response.data);
       alert(`Reminders processed: ${response.data.eventsProcessed || 0} events`);
     } catch (err) {
-      console.error('Failed to trigger reminders:', err);
+      logger.error('Failed to trigger reminders:', err);
       alert('Failed to trigger reminders');
     }
   };

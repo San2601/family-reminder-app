@@ -85,6 +85,9 @@ function EventForm({ event, onSave, onCancel }) {
               onChange={handleChange}
               placeholder="e.g., Mom's Birthday, Anniversary"
               required
+              autoComplete="off"
+              autoCapitalize="words"
+              maxLength="255"
             />
           </div>
           
@@ -101,6 +104,7 @@ function EventForm({ event, onSave, onCancel }) {
                 value={formData.event_date}
                 onChange={handleChange}
                 required
+                autoComplete="off"
               />
             </div>
             
@@ -156,6 +160,9 @@ function EventForm({ event, onSave, onCancel }) {
               onChange={handleChange}
               placeholder="Additional details about the event"
               rows={3}
+              autoComplete="off"
+              autoCapitalize="sentences"
+              maxLength="1000"
             />
           </div>
           

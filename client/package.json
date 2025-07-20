@@ -8,7 +8,8 @@
     "lucide-react": "^0.525.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.15.0"
+    "react-router-dom": "^6.15.0",
+    "react-swipeable": "^7.0.2"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -35,6 +36,7 @@
     ]
   },
   "devDependencies": {
+    "http-proxy-middleware": "^3.0.5",
     "react-scripts": "5.0.1"
   },
   "proxy": "http://localhost:5000"

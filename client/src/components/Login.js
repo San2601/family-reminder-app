@@ -106,6 +106,11 @@ function Login({ onLogin }) {
               onChange={handleChange}
               placeholder="Choose a username"
               required={!isLogin}
+              autoComplete="username"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck="false"
+              inputMode="text"
             />
           </div>
         )}
@@ -123,6 +128,11 @@ function Login({ onLogin }) {
             onChange={handleChange}
             placeholder="Enter your email"
             required
+            autoComplete="email"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck="false"
+            inputMode="email"
           />
         </div>
         
@@ -140,6 +150,10 @@ function Login({ onLogin }) {
               onChange={handleChange}
               placeholder="Enter your password"
               required
+              autoComplete={isLogin ? "current-password" : "new-password"}
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck="false"
               style={{ paddingRight: '40px' }}
             />
             <button

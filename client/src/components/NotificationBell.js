@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Bell } from 'lucide-react';
 import NotificationPanel from './NotificationPanel';
+import logger from '../utils/logger';
 
 function NotificationBell() {
   const [unreadCount, setUnreadCount] = useState(0);
@@ -12,7 +13,7 @@ function NotificationBell() {
       const response = await axios.get('/api/notifications/unread-count');
       setUnreadCount(response.data.count);
     } catch (error) {
-      console.error('Error fetching unread count:', error);
+      logger.error('Error fetching unread count:', error);
     }
   };
 

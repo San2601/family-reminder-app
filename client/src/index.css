@@ -1234,23 +1234,29 @@ body {
   }
 }
 
-/* Mobile and Small Screens */
+/* Mobile and Small Screens - Enhanced Touch-Friendly Design */
 @media (max-width: 767px) {
   .container {
     padding: 12px;
+    /* Ensure full viewport usage on mobile */
+    min-height: 100vh;
+    min-height: 100dvh; /* Dynamic viewport height for better mobile experience */
   }
   
   .header {
-    padding: 20px;
+    padding: 20px 16px;
     margin-bottom: 16px;
+    border-radius: 16px; /* Smaller radius for mobile */
   }
   
   .header h1 {
-    font-size: 24px;
+    font-size: 22px; /* Slightly smaller for mobile */
+    line-height: 1.3;
   }
   
   .header-subtitle {
     font-size: 14px;
+    line-height: 1.4;
   }
   
   .upcoming-events h2 {
@@ -1263,33 +1269,50 @@ body {
   
   .event-card h3 {
     font-size: 16px;
+    line-height: 1.3;
   }
   
   .event-card {
     padding: 16px;
+    border-radius: 16px; /* Consistent mobile radius */
+    /* Enhanced touch target */
+    min-height: 120px;
   }
   
   .upcoming-events {
     padding: 16px;
+    border-radius: 16px;
   }
   
   .dashboard-main {
     gap: 16px;
   }
   
+  /* Touch-Friendly Button Improvements */
   .action-button {
-    padding: 10px 16px;
+    padding: 14px 20px; /* Increased for better touch targets */
     font-size: 14px;
+    min-height: 48px; /* Apple/Google recommended minimum */
+    border-radius: 12px;
+    /* Add touch feedback */
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: rgba(255, 107, 157, 0.3);
+  }
+  
+  .action-button:active {
+    transform: scale(0.98);
+    opacity: 0.8;
   }
   
   .action-button svg {
-    width: 16px;
-    height: 16px;
+    width: 18px; /* Slightly larger for visibility */
+    height: 18px;
   }
   
+  /* Mobile Header Layout */
   .header-content {
     flex-direction: column;
-    gap: 16px;
+    gap: 20px; /* Increased spacing */
     align-items: stretch;
   }
   
@@ -1298,13 +1321,495 @@ body {
   }
   
   .header-actions {
+    display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 8px;
+    gap: 12px; /* Increased gap for touch */
+    padding: 0 8px;
+  }
+  
+  /* Mobile Navigation Improvements */
+  .header-actions .action-button {
+    flex: 1;
+    min-width: 140px; /* Ensure readable text */
+    max-width: 200px;
+    justify-content: center;
+  }
+  
+  /* Mobile-Specific Interactive Elements */
+  .logout-btn {
+    min-height: 44px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    -webkit-tap-highlight-color: rgba(239, 68, 68, 0.3);
+  }
+  
+  .notification-bell {
+    min-height: 44px;
+    min-width: 44px;
+    border-radius: 12px;
+    -webkit-tap-highlight-color: rgba(255, 107, 157, 0.3);
+  }
+  
+  /* Mobile Event Card Enhancements */
+  .event-card:active {
+    transform: scale(0.995);
+    transition: transform 0.1s ease;
+  }
+  
+  /* Mobile Typography Optimization */
+  body {
+    -webkit-text-size-adjust: 100%; /* Prevent text scaling on iOS */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
-/* Remove conflicting tablet styles - handled by main responsive system */
+/* Additional Mobile Breakpoints for Better Responsive Design */
+
+/* Small Mobile Devices (320px - 480px) */
+@media (max-width: 480px) {
+  .container {
+    padding: 8px;
+  }
+  
+  .header {
+    padding: 16px 12px;
+    margin-bottom: 12px;
+  }
+  
+  .header h1 {
+    font-size: 20px;
+  }
+  
+  .header-actions .action-button {
+    min-width: 120px;
+    font-size: 13px;
+    padding: 12px 16px;
+  }
+  
+  .event-card {
+    padding: 12px;
+    min-height: 100px;
+  }
+  
+  .upcoming-events, .dashboard-content {
+    padding: 12px;
+  }
+}
+
+/* Large Mobile Devices (481px - 767px) */
+@media (min-width: 481px) and (max-width: 767px) {
+  .header-actions {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  
+  .header-actions .action-button {
+    flex: 0 1 auto;
+    min-width: 130px;
+  }
+}
+
+/* Tablet Portrait (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .dashboard-main {
+    display: block;
+  }
+  
+  .dashboard-sidebar {
+    margin-bottom: 32px;
+  }
+  
+  /* Tablet-specific touch improvements */
+  .action-button {
+    min-height: 44px;
+    padding: 12px 20px;
+  }
+  
+  .event-card {
+    min-height: 140px;
+  }
+}
+
+/* Touch Device Improvements (All Screen Sizes) */
+@media (hover: none) and (pointer: coarse) {
+  /* Remove hover effects on touch devices */
+  .event-card:hover {
+    transform: none;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+  
+  .btn:hover, .action-button:hover {
+    transform: none;
+  }
+  
+  /* Add touch-specific feedback */
+  .event-card:active,
+  .btn:active,
+  .action-button:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+}
+
+/* Mobile Form Optimizations */
+@media (max-width: 767px) {
+  /* Modal improvements for mobile */
+  .modal-overlay {
+    padding: 16px;
+    align-items: flex-start;
+    padding-top: 20px;
+  }
+  
+  .modal {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    border-radius: 20px 20px 16px 16px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+  }
+  
+  .modal-header {
+    padding: 20px 20px 16px;
+    border-radius: 20px 20px 0 0;
+  }
+  
+  .modal-header h2 {
+    font-size: 20px;
+  }
+  
+  .modal-close {
+    min-height: 44px;
+    min-width: 44px;
+    border-radius: 12px;
+  }
+  
+  /* Enhanced form inputs for mobile */
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 16px;
+    border-radius: 12px;
+    min-height: 48px;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  
+  .form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+  
+  .form-group select {
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'%3E%3Cpath stroke='%23666' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px;
+    padding-right: 40px;
+  }
+  
+  /* Touch-friendly checkbox styling */
+  .checkbox-group {
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    margin: 16px 0;
+  }
+  
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 16px;
+    line-height: 1.4;
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(255, 107, 157, 0.3);
+  }
+  
+  .checkbox-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+  }
+  
+  /* Form button improvements */
+  .form-actions {
+    padding: 20px;
+    gap: 12px;
+    flex-direction: column;
+  }
+  
+  .form-actions .btn {
+    width: 100%;
+    min-height: 52px;
+    font-size: 16px;
+    border-radius: 16px;
+    font-weight: 600;
+  }
+  
+  /* Password visibility toggle for mobile */
+  .form-group button[type="button"] {
+    min-height: 44px;
+    min-width: 44px;
+    border-radius: 8px;
+    -webkit-tap-highlight-color: rgba(255, 107, 157, 0.3);
+  }
+  
+  /* Remember Me checkbox mobile styling */
+  .remember-me-group {
+    padding: 12px 0;
+    justify-content: center;
+  }
+  
+  .remember-me-group label {
+    font-size: 15px;
+    gap: 10px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(255, 107, 157, 0.3);
+  }
+  
+  /* Auth form specific mobile improvements */
+  .auth-form {
+    padding: 24px 20px;
+    border-radius: 20px;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+  
+  .auth-form .btn {
+    min-height: 52px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 16px;
+  }
+  
+  /* Loading states for mobile */
+  .loading-spinner {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* Landscape mobile optimizations */
+@media (max-width: 767px) and (orientation: landscape) {
+  .modal {
+    max-height: calc(100vh - 20px);
+    margin-top: 10px;
+  }
+  
+  .auth-container {
+    padding: 12px;
+  }
+  
+  .header {
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  
+  .header h1 {
+    font-size: 20px;
+  }
+}
+
+/* Mobile Performance Optimizations */
+@media (max-width: 767px) {
+  /* Reduce backdrop-filter complexity on mobile for better performance */
+  .event-card,
+  .upcoming-events,
+  .header {
+    backdrop-filter: blur(10px); /* Reduced from 20px */
+  }
+  
+  /* Optimize animations for mobile */
+  .event-card,
+  .action-button,
+  .btn {
+    will-change: transform;
+  }
+  
+  /* Disable expensive animations on low-end devices */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+  
+  /* Optimize font rendering on mobile */
+  body, input, textarea, select, button {
+    text-rendering: optimizeSpeed;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Hardware acceleration for better performance */
+  .modal-overlay,
+  .notification-panel-overlay {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+  
+  /* Reduce paint complexity */
+  .floating-element {
+    display: none; /* Hide decorative elements on mobile */
+  }
+}
+
+/* Network-aware optimizations */
+@media (max-width: 767px) {
+  /* Reduce shadow complexity for better performance */
+  .event-card {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+  
+  .event-card:hover {
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Simplify gradients on mobile */
+  .header::before {
+    display: none; /* Remove decorative background element */
+  }
+}
+
+/* Error Boundary Styles */
+.error-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 40px 20px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  margin: 20px;
+  box-shadow: 0 8px 32px rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.error-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.error-fallback h2 {
+  color: #DC2626;
+  font-size: 24px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.error-fallback p {
+  color: #6B7280;
+  font-size: 16px;
+  margin-bottom: 24px;
+  max-width: 400px;
+  line-height: 1.5;
+}
+
+.error-details {
+  margin: 20px 0;
+  padding: 16px;
+  background: #F3F4F6;
+  border-radius: 8px;
+  text-align: left;
+  max-width: 600px;
+  width: 100%;
+}
+
+.error-details summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.error-details pre {
+  font-size: 12px;
+  color: #DC2626;
+  white-space: pre-wrap;
+  margin: 8px 0;
+  padding: 8px;
+  background: white;
+  border-radius: 4px;
+  border: 1px solid #E5E7EB;
+  overflow-x: auto;
+}
+
+.error-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.error-retry-btn,
+.error-refresh-btn {
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  min-height: 44px;
+}
+
+.error-retry-btn {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: white;
+}
+
+.error-retry-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.error-refresh-btn {
+  background: rgba(107, 114, 128, 0.1);
+  color: #374151;
+  border: 1px solid rgba(107, 114, 128, 0.2);
+}
+
+.error-refresh-btn:hover {
+  background: rgba(107, 114, 128, 0.15);
+  transform: translateY(-1px);
+}
+
+/* Mobile error fallback */
+@media (max-width: 767px) {
+  .error-fallback {
+    margin: 12px;
+    padding: 24px 16px;
+    min-height: 300px;
+  }
+  
+  .error-fallback h2 {
+    font-size: 20px;
+  }
+  
+  .error-fallback p {
+    font-size: 14px;
+  }
+  
+  .error-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .error-retry-btn,
+  .error-refresh-btn {
+    width: 100%;
+  }
+}
 
 /* Icon Colors */
 .section-icon {
@@ -1573,6 +2078,91 @@ body {
 .mark-read-btn:hover {
   background: rgba(139, 95, 191, 0.1);
   color: #8B5FBF;
+}
+
+/* Mobile Notification Panel Optimizations */
+@media (max-width: 767px) {
+  .notification-panel-overlay {
+    align-items: flex-end;
+    padding: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+  }
+  
+  .notification-panel {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    border-radius: 20px 20px 0 0;
+    max-height: 85vh;
+    animation: slideUpMobile 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  
+  .notification-header {
+    padding: 20px 20px 16px;
+    border-radius: 20px 20px 0 0;
+    position: sticky;
+    top: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 1;
+  }
+  
+  .notification-content {
+    padding: 0 20px 20px;
+    max-height: calc(85vh - 80px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .notification-item {
+    padding: 16px;
+    margin-bottom: 12px;
+    border-radius: 16px;
+    position: relative;
+  }
+  
+  .notification-item.unread {
+    background: linear-gradient(135deg, rgba(255, 107, 157, 0.1) 0%, rgba(255, 138, 80, 0.1) 100%);
+    border-left: 4px solid #FF6B9D;
+  }
+  
+  .notification-item:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+  
+  .mark-read-btn {
+    min-height: 40px;
+    min-width: 40px;
+    border-radius: 10px;
+    -webkit-tap-highlight-color: rgba(255, 107, 157, 0.3);
+  }
+  
+  .mark-all-read-btn {
+    min-height: 40px;
+    min-width: 40px;
+    border-radius: 10px;
+    -webkit-tap-highlight-color: rgba(255, 107, 157, 0.3);
+  }
+  
+  .close-panel-btn {
+    min-height: 44px;
+    min-width: 44px;
+    border-radius: 12px;
+    -webkit-tap-highlight-color: rgba(239, 68, 68, 0.3);
+  }
+}
+
+@keyframes slideUpMobile {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 /* Desktop notification panel positioning */
