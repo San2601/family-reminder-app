@@ -1,7 +1,43 @@
-import jwt from 'jsonwebtoken';
-import { openDB } from '../lib/db.js';
+const jwt = require('jsonwebtoken');
+const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev';
+
+// Database path for serverless environment
+const dbPath = path.join('/tmp', 'database.db');
+
+const initDatabase = (db) => {
+  return new Promise((resolve, reject) => {
+    db.serialize(() => {
+      db.run(`CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE,
+        email TEXT UNIQUE,
+        password TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )`, (err) => {
+        if (err) console.error('Users table error:', err);
+      });
+      
+      db.run(`CREATE TABLE IF NOT EXISTS events (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        creator_id INTEGER,
+        title TEXT NOT NULL,
+        description TEXT,
+        event_date DATE NOT NULL,
+        event_type TEXT DEFAULT 'birthday',
+        reminder_days INTEGER DEFAULT 1,
+        is_recurring BOOLEAN DEFAULT 0,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (creator_id) REFERENCES users (id)
+      )`, (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+  });
+};
 
 const authenticateToken = (req) => {
   const authHeader = req.headers.authorization;
@@ -18,7 +54,7 @@ const authenticateToken = (req) => {
   }
 };
 
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -32,7 +68,8 @@ export default async function handler(req, res) {
 
   try {
     const user = authenticateToken(req);
-    const db = await openDB();
+    const db = new sqlite3.Database(dbPath);
+    await initDatabase(db);
     
     if (req.method === 'GET') {
       const { upcoming } = req.query;
@@ -42,25 +79,39 @@ export default async function handler(req, res) {
         const today = new Date().toISOString().split('T')[0];
         const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
         
-        const events = await db.all(
-          `SELECT e.*, u.username as creator_name 
-           FROM events e 
-           JOIN users u ON e.creator_id = u.id 
-           WHERE e.event_date BETWEEN ? AND ? 
-           ORDER BY e.event_date ASC`,
-          [today, nextWeek]
-        );
+        const events = await new Promise((resolve, reject) => {
+          db.all(
+            `SELECT e.*, u.username as creator_name 
+             FROM events e 
+             JOIN users u ON e.creator_id = u.id 
+             WHERE e.event_date BETWEEN ? AND ? 
+             ORDER BY e.event_date ASC`,
+            [today, nextWeek],
+            (err, rows) => {
+              if (err) reject(err);
+              else resolve(rows);
+            }
+          );
+        });
         
+        db.close();
         res.json(events);
       } else {
         // Get all events
-        const events = await db.all(
-          `SELECT e.*, u.username as creator_name 
-           FROM events e 
-           JOIN users u ON e.creator_id = u.id 
-           ORDER BY e.event_date ASC`
-        );
+        const events = await new Promise((resolve, reject) => {
+          db.all(
+            `SELECT e.*, u.username as creator_name 
+             FROM events e 
+             JOIN users u ON e.creator_id = u.id 
+             ORDER BY e.event_date ASC`,
+            (err, rows) => {
+              if (err) reject(err);
+              else resolve(rows || []);
+            }
+          );
+        });
         
+        db.close();
         res.json(events);
       }
     } 
@@ -69,57 +120,27 @@ export default async function handler(req, res) {
       const { title, description, event_date, event_type, reminder_days, is_recurring } = req.body;
       
       if (!title || !event_date) {
+        db.close();
         return res.status(400).json({ error: 'Title and event date are required' });
       }
 
-      const result = await db.run(
-        'INSERT INTO events (creator_id, title, description, event_date, event_type, reminder_days, is_recurring) VALUES (?, ?, ?, ?, ?, ?, ?)',
-        [user.id, title, description, event_date, event_type || 'general', reminder_days || 7, is_recurring || 0]
-      );
+      const result = await new Promise((resolve, reject) => {
+        db.run(
+          'INSERT INTO events (creator_id, title, description, event_date, event_type, reminder_days, is_recurring) VALUES (?, ?, ?, ?, ?, ?, ?)',
+          [user.id || user.userId, title, description, event_date, event_type || 'birthday', reminder_days || 1, is_recurring || 0],
+          function(err) {
+            if (err) reject(err);
+            else resolve({ lastID: this.lastID });
+          }
+        );
+      });
       
-      const event = await db.get(
-        `SELECT e.*, u.username as creator_name 
-         FROM events e 
-         JOIN users u ON e.creator_id = u.id 
-         WHERE e.id = ?`, 
-        [result.lastID]
-      );
-      
-      res.status(201).json(event);
-    } 
-    
-    else if (req.method === 'PUT') {
-      const { id } = req.query;
-      const { title, description, event_date, event_type, reminder_days, is_recurring } = req.body;
-
-      const result = await db.run(
-        'UPDATE events SET title = ?, description = ?, event_date = ?, event_type = ?, reminder_days = ?, is_recurring = ? WHERE id = ? AND creator_id = ?',
-        [title, description, event_date, event_type, reminder_days, is_recurring, id, user.id]
-      );
-      
-      if (result.changes === 0) {
-        return res.status(404).json({ error: 'Event not found or you are not the creator' });
-      }
-      
-      res.json({ message: 'Event updated successfully' });
-    } 
-    
-    else if (req.method === 'DELETE') {
-      const { id } = req.query;
-
-      const result = await db.run(
-        'DELETE FROM events WHERE id = ? AND creator_id = ?',
-        [id, user.id]
-      );
-      
-      if (result.changes === 0) {
-        return res.status(404).json({ error: 'Event not found or you are not the creator' });
-      }
-      
-      res.json({ message: 'Event deleted successfully' });
+      db.close();
+      res.status(201).json({ id: result.lastID, message: 'Event created successfully' });
     } 
     
     else {
+      db.close();
       res.status(405).json({ error: 'Method not allowed' });
     }
   } catch (error) {
@@ -130,4 +151,4 @@ export default async function handler(req, res) {
       res.status(500).json({ error: 'Internal server error' });
     }
   }
-}
+};
