@@ -7,48 +7,25 @@
       "config": {
         "distDir": "build"
       }
+    },
+    {
+      "src": "server/index.js",
+      "use": "@vercel/node"
     }
   ],
-  "functions": {
-    "api/auth.js": {
-      "runtime": "nodejs18.x"
-    },
-    "api/events.js": {
-      "runtime": "nodejs18.x"
-    }
-  },
   "routes": [
     {
-      "src": "/api/register",
-      "dest": "/api/auth.js",
-      "methods": ["POST"]
-    },
-    {
-      "src": "/api/login", 
-      "dest": "/api/auth.js",
-      "methods": ["POST"]
-    },
-    {
-      "src": "/api/events",
-      "dest": "/api/events.js",
-      "methods": ["GET", "POST"]
-    },
-    {
-      "src": "/api/events/(.*)",
-      "dest": "/api/events.js",
-      "methods": ["PUT", "DELETE"]
-    },
-    {
-      "src": "/api/upcoming-events",
-      "dest": "/api/events.js?upcoming=true",
-      "methods": ["GET"]
+      "src": "/api/(.*)",
+      "dest": "/server/index.js"
     },
     {
       "src": "/(.*)",
-      "dest": "/client/build/index.html"
+      "dest": "/client/build/$1"
     }
   ],
   "env": {
     "JWT_SECRET": "@jwt-secret"
-  }
+  },
+  "installCommand": "npm run install-deps",
+  "buildCommand": "cd client && npm run build"
 }
