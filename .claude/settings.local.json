@@ -17,7 +17,8 @@
       "Bash(rm:*)",
       "Bash(wmic process where:*)",
       "Bash(npm audit:*)",
-      "Bash(npm update)"
+      "Bash(npm update)",
+      "Bash(touch:*)"
     ],
     "deny": []
   }

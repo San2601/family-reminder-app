@@ -7,8 +7,10 @@ import ErrorBoundary from './components/ErrorBoundary';
 const Login = lazy(() => import('./components/Login'));
 const Dashboard = lazy(() => import('./components/Dashboard'));
 
-// Use proxy in development, explicit URL in production
-const API_URL = process.env.REACT_APP_API_URL || '';
+// Configure API URL - use localhost in development, relative in production
+const API_URL = process.env.NODE_ENV === 'development' 
+  ? process.env.REACT_APP_API_URL || 'http://localhost:5000'
+  : '';
 
 if (API_URL) {
   axios.defaults.baseURL = API_URL;
