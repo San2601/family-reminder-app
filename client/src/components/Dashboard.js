@@ -3,6 +3,8 @@ import axios from 'axios';
 import { Plus, Calendar, Users, Bell, Loader2, Clock } from 'lucide-react';
 import EventForm from './EventForm';
 import EventCard from './EventCard';
+import NotificationBell from './NotificationBell';
+import ErrorBoundary from './ErrorBoundary';
 
 function Dashboard({ user, onLogout }) {
   const [events, setEvents] = useState([]);
@@ -61,6 +63,22 @@ function Dashboard({ user, onLogout }) {
     }
   };
 
+  const handleAdminEventDeleted = (eventId) => {
+    setEvents(events.filter(event => event.id !== eventId));
+    fetchUpcomingEvents();
+  };
+
+  const triggerReminders = async () => {
+    try {
+      const response = await axios.post('/api/trigger-reminders');
+      console.log('Reminders triggered:', response.data);
+      alert(`Reminders processed: ${response.data.eventsProcessed || 0} events`);
+    } catch (err) {
+      console.error('Failed to trigger reminders:', err);
+      alert('Failed to trigger reminders');
+    }
+  };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -101,10 +119,19 @@ function Dashboard({ user, onLogout }) {
             <h1>
               <Calendar className="header-icon" size={32} />
               Welcome, {user.username}!
+              {user.is_admin && (
+                <span className="admin-badge" title="Administrator">
+                  <Users size={16} />
+                  Admin
+                </span>
+              )}
             </h1>
             <p className="header-subtitle">Manage your family's important events and reminders</p>
           </div>
           <div className="header-actions">
+            <ErrorBoundary>
+              <NotificationBell />
+            </ErrorBoundary>
             <button
               className="action-button"
               onClick={() => setShowEventForm(true)}
@@ -112,6 +139,16 @@ function Dashboard({ user, onLogout }) {
               <Plus size={20} />
               Add Event
             </button>
+            {user.is_admin && (
+              <button
+                className="action-button"
+                onClick={triggerReminders}
+                style={{ background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)' }}
+              >
+                <Bell size={20} />
+                Test Reminders
+              </button>
+            )}
             <button className="logout-btn" onClick={onLogout}>
               Logout
             </button>
@@ -184,6 +221,7 @@ function Dashboard({ user, onLogout }) {
                   currentUser={user}
                   onEdit={setEditingEvent}
                   onDelete={handleEventDeleted}
+                  onAdminDelete={handleAdminEventDeleted}
                   formatDate={formatDate}
                   getDaysUntil={getDaysUntil}
                 />

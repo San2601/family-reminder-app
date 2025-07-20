@@ -14,13 +14,18 @@ function Login({ onLogin }) {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
-  // Load saved credentials on component mount
+  // Load saved credentials on component mount - SECURITY FIX: only email, not password
   useEffect(() => {
     const savedCredentials = localStorage.getItem('savedCredentials');
     if (savedCredentials) {
-      const { email, password, remember } = JSON.parse(savedCredentials);
-      setFormData(prev => ({ ...prev, email, password }));
-      setRememberMe(remember);
+      try {
+        const { email, remember } = JSON.parse(savedCredentials);
+        setFormData(prev => ({ ...prev, email })); // Only load email, not password
+        setRememberMe(remember || false);
+      } catch (error) {
+        // Clear invalid saved data
+        localStorage.removeItem('savedCredentials');
+      }
     }
   }, []);
 
@@ -44,12 +49,12 @@ function Login({ onLogin }) {
 
       const response = await axios.post(endpoint, data);
       
-      // Save credentials if Remember Me is checked and login is successful
+      // SECURITY FIX: Only save email, never store passwords in localStorage
       if (isLogin && rememberMe) {
         localStorage.setItem('savedCredentials', JSON.stringify({
           email: formData.email,
-          password: formData.password,
           remember: true
+          // REMOVED: password storage - NEVER store passwords in localStorage!
         }));
       } else if (isLogin && !rememberMe) {
         // Remove saved credentials if Remember Me is unchecked

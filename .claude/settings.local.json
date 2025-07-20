@@ -4,7 +4,20 @@
       "Bash(mkdir:*)",
       "Bash(npx create-react-app:*)",
       "Bash(npm run:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(npm install:*)",
+      "Bash(taskkill:*)",
+      "Bash(set PORT=5001)",
+      "Bash(curl:*)",
+      "Bash(git push:*)",
+      "Bash(sqlite3:*)",
+      "Bash(node:*)",
+      "Bash(del debug-db.js fix-db.js fix-users.js)",
+      "Bash(rm:*)",
+      "Bash(wmic process where:*)",
+      "Bash(npm audit:*)",
+      "Bash(npm update)"
     ],
     "deny": []
   }

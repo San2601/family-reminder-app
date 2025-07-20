@@ -1,7 +1,8 @@
 import React from 'react';
-import { Edit3, Trash2, User, Calendar, Clock, Repeat, Gift, Heart, TreePine, Briefcase, Coffee } from 'lucide-react';
+import { Edit3, Trash2, User, Calendar, Clock, Repeat, Gift, Heart, TreePine, Briefcase, Coffee, Shield } from 'lucide-react';
+import axios from 'axios';
 
-function EventCard({ event, onEdit, onDelete, formatDate, getDaysUntil, currentUser }) {
+function EventCard({ event, onEdit, onDelete, formatDate, getDaysUntil, currentUser, onAdminDelete }) {
   const getEventTypeColor = (type) => {
     const colors = {
       birthday: '#ff6b6b',
@@ -33,7 +34,22 @@ function EventCard({ event, onEdit, onDelete, formatDate, getDaysUntil, currentU
     }
   };
 
+  const handleAdminDelete = async () => {
+    if (window.confirm(`Are you sure you want to delete "${event.title}" as an admin? This action cannot be undone.`)) {
+      try {
+        await axios.delete(`/api/admin/events/${event.id}`);
+        if (onAdminDelete) {
+          onAdminDelete(event.id);
+        }
+      } catch (error) {
+        console.error('Error deleting event as admin:', error);
+        alert('Failed to delete event. Please try again.');
+      }
+    }
+  };
+
   const isCreator = currentUser && event.creator_id === currentUser.id;
+  const isAdmin = currentUser && currentUser.is_admin;
 
   return (
     <div className="event-card">
@@ -86,25 +102,39 @@ function EventCard({ event, onEdit, onDelete, formatDate, getDaysUntil, currentU
         </div>
       </div>
       
-      {isCreator && (
+      {(isCreator || isAdmin) && (
         <div className="event-actions">
-          <button
-            className="btn btn-small btn-warning"
-            onClick={() => onEdit(event)}
-          >
-            <Edit3 size={14} />
-            Edit
-          </button>
-          <button
-            className="btn btn-small btn-danger"
-            onClick={handleDelete}
-          >
-            <Trash2 size={14} />
-            Delete
-          </button>
+          {isCreator && (
+            <>
+              <button
+                className="btn btn-small btn-warning"
+                onClick={() => onEdit(event)}
+              >
+                <Edit3 size={14} />
+                Edit
+              </button>
+              <button
+                className="btn btn-small btn-danger"
+                onClick={handleDelete}
+              >
+                <Trash2 size={14} />
+                Delete
+              </button>
+            </>
+          )}
+          {isAdmin && !isCreator && (
+            <button
+              className="btn btn-small btn-admin"
+              onClick={handleAdminDelete}
+              title="Admin delete - can delete any event"
+            >
+              <Shield size={14} />
+              Admin Delete
+            </button>
+          )}
         </div>
       )}
-      {!isCreator && (
+      {!isCreator && !isAdmin && (
         <div className="event-permissions-notice">
           Only the creator can edit this event
         </div>
